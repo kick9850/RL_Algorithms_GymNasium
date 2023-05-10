@@ -398,7 +398,7 @@ def SAC(n_interactions, print_every=10):
                 score = 0
                 break
 
-    torch.save(agent.actor_local.state_dict(), args.info + ".pt")
+    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/"+ args.env + args.info + ".pt")
 
 
 def play():
@@ -410,7 +410,7 @@ def play():
             action = agent.act(state)
             action_v = action[0].numpy()
             action_v = np.clip(action_v * action_high, action_low, action_high)
-            next_state, reward, done, info = env.step(action_v)
+            next_state, reward, done, _, info = env.step(action_v)
             next_state = next_state
             state = next_state
 
