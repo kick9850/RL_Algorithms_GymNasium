@@ -12,7 +12,7 @@ OpenAi github         : https://github.com/Farama-Foundation/Gymnasium
 <br/>mucjoco 2.3.3
 <br/>pygame 2.3.0
 
-#Watching Original Git Code
+# Watching Original Git Code
 <br/> https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26/
 <br/> https://gymnasium.farama.org/tutorials/training_agents/blackjack_tutorial/
 <br/> https://gymnasium.farama.org/tutorials/training_agents/FrozenLake_tuto/
