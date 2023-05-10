@@ -13,7 +13,7 @@ OpenAi github         : https://github.com/Farama-Foundation/Gymnasium
 # Using Python library list
 Python 3.8
 <br/>Pytorch 1.13.1
-<br/>mucjoco 2.3.3
+<br/>mujoco 2.3.3
 <br/>pygame 2.3.0
 
 # Watching Original Git Code
