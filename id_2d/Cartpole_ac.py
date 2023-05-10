@@ -39,7 +39,7 @@ class Policy(nn.Module):
 
         self.save_actions = []
         self.rewards = []
-        os.makedirs('./AC_CartPole-v1', exist_ok=True)
+        os.makedirs('./save_model/AC_CartPole-v1', exist_ok=True)
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
@@ -101,7 +101,7 @@ def finish_episode():
 def main():
     running_reward = 10
     live_time = []
-    for i_episode in count(episodes):
+    for i_episode in range(episodes):
         state, info = env.reset()
         for t in count():
             action = select_action(state)
