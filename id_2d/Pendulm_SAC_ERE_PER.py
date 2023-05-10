@@ -363,8 +363,8 @@ def SAC(n_interactions, print_every=10):
     eta_0 = 0.996
     eta_T = 1.0
     episodes = 0
-    max_ep_len = 500  # original = 1000
-    c_k_min = 2500  # original = 5000
+    max_ep_len = 10000  # original = 1000
+    c_k_min = 5000  # original = 5000
     t = 0
     # for t in range(1, int(n_interactions)+1):
     while t < n_interactions:
