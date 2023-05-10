@@ -362,7 +362,7 @@ def SAC(n_episodes=200, max_t=1000, print_every=10):
 
         state, info = env.reset()
         score = 0
-        while True:
+        for t in range(max_t):
             t += 1
             action = agent.act(state)
             action_v = action[0].numpy()
@@ -448,7 +448,7 @@ if __name__ == "__main__":
     action_high = env.action_space.high[0]
     action_low = env.action_space.low[0]
 
-    writer = SummaryWriter("./save_model/SAC_PER/" + args.env)
+    writer = SummaryWriter("./save_model/" + args.env+ "/SAC_PER")
     agent = Agent(state_size=state_size, action_size=action_size, random_seed=seed, action_prior="uniform")  # "normal"
 
     start_time = time.time()

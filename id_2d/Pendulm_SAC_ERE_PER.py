@@ -361,7 +361,7 @@ def SAC(n_interactions, print_every=10):
     eta_0 = 0.996
     eta_T = 1.0
     episodes = 0
-    max_ep_len = 10000  # original = 1000
+    max_ep_len = 1000  # original = 1000
     c_k_min = 5000  # original = 5000
     t = 0
     # for t in range(1, int(n_interactions)+1):
@@ -369,7 +369,7 @@ def SAC(n_interactions, print_every=10):
         state, info = env.reset()
         episode_K = 0
         score = 0
-        for i in range(max_ep_len):
+        for t in range(max_ep_len):
             t += 1
             action = agent.act(state)
             action_v = action[0].numpy()
@@ -380,7 +380,7 @@ def SAC(n_interactions, print_every=10):
             state = next_state
             score += reward
             episode_K += 1
-            if done or i == max_ep_len:
+            if done:
                 episodes += 1
                 for k in range(1, episode_K):
                     c_k = max(int(agent.memory.__len__() * eta_t ** (k * (max_ep_len / episode_K))), c_k_min)
@@ -396,7 +396,7 @@ def SAC(n_interactions, print_every=10):
                                                                                           np.mean(scores_deque)))
                 break
 
-    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/"+ args.env + "/" + args.info + ".pt")
+    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/" + args.info + ".pt")
 
 
 def play():
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     action_size = env.action_space.shape[0]
     action_high = env.action_space.high[0]
     action_low = env.action_space.low[0]
-    writer = SummaryWriter("./save_model/SAC_ERE_PER/"+args.env)
+    writer = SummaryWriter("./save_model/"+args.env +"/SAC_ERE_PER")
     agent = Agent(state_size=state_size, action_size=action_size, random_seed=seed, action_prior="uniform")  # "normal"
 
     start_time = time.time()

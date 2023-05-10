@@ -421,7 +421,7 @@ if __name__ == "__main__":
     saved_model = args.saved_model
 
     t0 = time.time()
-    writer = SummaryWriter("./save_model/SAC/"+args.env)
+    writer = SummaryWriter("./save_model/"+args.env+"/SAC")
     env = gym.make(env_name)
     action_high = env.action_space.high[0]
     action_low = env.action_space.low[0]
