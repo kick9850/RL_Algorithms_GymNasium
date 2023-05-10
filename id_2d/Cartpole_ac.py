@@ -116,7 +116,7 @@ def main():
         plot(live_time)
         if i_episode % 100 == 0:
             print(f"episode {i_episode}, reward : {reward}")
-            #modelPath = './AC_CartPole_Model/ModelTraing'+str(i_episode)+'Times.pkl'
+            #modelPath = './save_model/AC_CartPole_Model/ModelTraing'+str(i_episode)+'Times.pkl'
             #torch.save(model, modelPath)
         finish_episode()
 
