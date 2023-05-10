@@ -404,7 +404,7 @@ def SAC(n_interactions, print_every=10):
 def play():
     agent.actor_local.eval()
     for i_episode in range(1):
-        state = env.reset()
+        state, info = env.reset()
 
         while True:
             action = agent.act(state)
