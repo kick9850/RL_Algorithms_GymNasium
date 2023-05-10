@@ -34,10 +34,11 @@ class Actor(nn.Module):
             fc2_units (int): Number of nodes in second hidden layer
         """
         super(Actor, self).__init__()
+        self.init_w = init_w
         self.seed = torch.manual_seed(seed)
         self.log_std_min = log_std_min
         self.log_std_max = log_std_max
-        self.init_w = init_w
+
         self.fc1 = nn.Linear(state_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
 
@@ -73,7 +74,6 @@ class Actor(nn.Module):
         returns the action based on a squashed gaussian policy. That means the samples are obtained according to:
         a(s,e)= tanh(mu(s)+sigma(s)+e)
         """
-        # state = torch.FloatTensor(state).unsqueeze(0).to(device)
         mu, log_std = self.forward(state.unsqueeze(0))
         std = log_std.exp()
 
@@ -140,7 +140,7 @@ class Agent():
 
         print("Using: ", device)
 
-        # Actor Network
+        # Actor Network 
         self.actor_local = Actor(state_size, action_size, random_seed).to(device)
         self.actor_optimizer = optim.Adam(self.actor_local.parameters(), lr=LR_ACTOR)
 
@@ -158,18 +158,17 @@ class Agent():
         self.critic2_optimizer = optim.Adam(self.critic2.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
 
         # Replay memory
-        # self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, random_seed)
         self.memory = PrioritizedReplay(capacity=BUFFER_SIZE)
 
-    def add_sample(self, state, action, reward, next_state, done):
+    def step(self, state, action, reward, next_state, done, step):
         """Save experience in replay memory, and use random sample from buffer to learn."""
         # Save experience / reward
         self.memory.push(state, action, reward, next_state, done)
 
-    def step(self, c_k):
         # Learn, if enough samples are available in memory
-        experiences = self.memory.sample(BATCH_SIZE, c_k)
-        self.learn(experiences, GAMMA)
+        if len(self.memory) > BATCH_SIZE:
+            experiences = self.memory.sample(BATCH_SIZE)
+            self.learn(step, experiences, GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -177,7 +176,7 @@ class Agent():
         action = self.actor_local.get_action(state).detach()
         return action
 
-    def learn(self, experiences, gamma):
+    def learn(self, step, experiences, gamma, d=1):
         """Updates actor, critics and entropy_alpha parameters using given batch of experience tuples.
         Q_targets = r + γ * (min_critic_target(next_state, actor_target(next_state)) - α *log_pi(next_action|next_state))
         Critic_loss = MSE(Q, Q_target)
@@ -187,14 +186,13 @@ class Agent():
             critic_target(state, action) -> Q-value
         Params
         ======
-            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples
+            experiences (Tuple[torch.Tensor]): tuple of (s, a, r, s', done) tuples 
             gamma (float): discount factor
         """
         states, actions, rewards, next_states, dones, idx, weights = experiences
         states = torch.FloatTensor(np.float32(states)).to(device)
         next_states = torch.FloatTensor(np.float32(next_states)).to(device)
-        actions = torch.cat(actions).to(device)  # .unsqueeze(1)
-
+        actions = torch.cat(actions).to(device)
         rewards = torch.FloatTensor(rewards).to(device).unsqueeze(1)
         dones = torch.FloatTensor(dones).to(device).unsqueeze(1)
         weights = torch.FloatTensor(weights).unsqueeze(1)
@@ -212,8 +210,7 @@ class Agent():
         # Compute Q targets for current states (y_i)
         Q_targets = rewards.cpu() + (
                     gamma * (1 - dones.cpu()) * (Q_target_next - self.alpha * log_pis_next.mean(1).unsqueeze(1).cpu()))
-        # TD_L1 = rewards.cpu() + (gamma * (1 - dones.cpu()) * (Q_target1_next.cpu() - self.alpha * log_pis_next.mean(1).unsqueeze(1).cpu()))
-        # TD_L2 = rewards.cpu() + (gamma * (1 - dones.cpu()) * (Q_target2_next.cpu() - self.alpha * log_pis_next.mean(1).unsqueeze(1).cpu()))
+
         # Compute critic loss
         Q_1 = self.critic1(states, actions).cpu()
         Q_2 = self.critic2(states, actions).cpu()
@@ -234,35 +231,37 @@ class Agent():
         self.critic2_optimizer.step()
 
         self.memory.update_priorities(idx, prios.data.cpu().numpy())
+        if step % d == 0:
+            # ---------------------------- update actor ---------------------------- #
 
-        alpha = torch.exp(self.log_alpha)
-        # Compute alpha loss
-        actions_pred, log_pis = self.actor_local.evaluate(states)
-        alpha_loss = - (self.log_alpha.cpu() * (log_pis.cpu() + self.target_entropy).detach().cpu()).mean()
-        self.alpha_optimizer.zero_grad()
-        alpha_loss.backward()
-        self.alpha_optimizer.step()
+            alpha = torch.exp(self.log_alpha)
+            # Compute alpha loss
+            actions_pred, log_pis = self.actor_local.evaluate(states)
+            alpha_loss = - (self.log_alpha.cpu() * (log_pis.cpu() + self.target_entropy).detach().cpu()).mean()
+            self.alpha_optimizer.zero_grad()
+            alpha_loss.backward()
+            self.alpha_optimizer.step()
 
-        self.alpha = alpha
-        # Compute actor loss
-        if self._action_prior == "normal":
-            policy_prior = MultivariateNormal(loc=torch.zeros(self.action_size),
-                                              scale_tril=torch.ones(self.action_size).unsqueeze(0))
-            policy_prior_log_probs = policy_prior.log_prob(actions_pred)
-        elif self._action_prior == "uniform":
-            policy_prior_log_probs = 0.0
+            self.alpha = alpha
+            # Compute actor loss
+            if self._action_prior == "normal":
+                policy_prior = MultivariateNormal(loc=torch.zeros(self.action_size),
+                                                  scale_tril=torch.ones(self.action_size).unsqueeze(0))
+                policy_prior_log_probs = policy_prior.log_prob(actions_pred)
+            elif self._action_prior == "uniform":
+                policy_prior_log_probs = 0.0
 
-        actor_loss = ((alpha * log_pis.squeeze(0).cpu() - self.critic1(states, actions_pred.squeeze(
-            0)).cpu() - policy_prior_log_probs) * weights).mean()
+            actor_loss = ((alpha * log_pis.squeeze(0).cpu() - self.critic1(states, actions_pred.squeeze(
+                0)).cpu() - policy_prior_log_probs) * weights).mean()
 
-        # Minimize the loss
-        self.actor_optimizer.zero_grad()
-        actor_loss.backward()
-        self.actor_optimizer.step()
+            # Minimize the loss
+            self.actor_optimizer.zero_grad()
+            actor_loss.backward()
+            self.actor_optimizer.step()
 
-        # ----------------------- update target networks ----------------------- #
-        self.soft_update(self.critic1, self.critic1_target, TAU)
-        self.soft_update(self.critic2, self.critic2_target, TAU)
+            # ----------------------- update target networks ----------------------- #
+            self.soft_update(self.critic1, self.critic1_target, TAU)
+            self.soft_update(self.critic2, self.critic2_target, TAU)
 
     def soft_update(self, local_model, target_model, tau):
         """Soft update model parameters.
@@ -271,7 +270,7 @@ class Agent():
         ======
             local_model: PyTorch model (weights will be copied from)
             target_model: PyTorch model (weights will be copied to)
-            tau (float): interpolation parameter
+            tau (float): interpolation parameter 
         """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
@@ -282,15 +281,15 @@ class PrioritizedReplay(object):
     Proportional Prioritization
     """
 
-    def __init__(self, capacity, alpha=0.6, beta_start=0.4, beta_frames=int(1e5)):
+    def __init__(self, capacity, alpha=0.6, beta_start=0.4, beta_frames=100000):
         self.alpha = alpha
         self.beta_start = beta_start
         self.beta_frames = beta_frames
         self.frame = 1  # for beta calculation
         self.capacity = capacity
-        self.buffer = deque(maxlen=capacity)
+        self.buffer = []
         self.pos = 0
-        self.priorities = deque(maxlen=capacity)
+        self.priorities = np.zeros((capacity,), dtype=np.float32)
 
     def beta_by_frame(self, frame_idx):
         """
@@ -298,11 +297,8 @@ class PrioritizedReplay(object):
 
         3.4 ANNEALING THE BIAS (Paper: PER)
         We therefore exploit the flexibility of annealing the amount of importance-sampling
-        correction over time, by defining a schedule on the exponent
-        that reaches 1 only at the end of
-        learning. In practice, we linearly anneal
-        from its initial value
-        0 to 1
+        correction over time, by defining a schedule on the exponent 
+        that reaches 1 only at the end of learning. In practice, we linearly anneal from its initial value 0 to 1
         """
         return min(1.0, self.beta_start + frame_idx * (1.0 - self.beta_start) / self.beta_frames)
 
@@ -311,35 +307,39 @@ class PrioritizedReplay(object):
         state = np.expand_dims(state, 0)
         next_state = np.expand_dims(next_state, 0)
 
-        max_prio = max(self.priorities) if self.buffer else 1.0  # gives max priority if buffer is not empty else 1
+        max_prio = self.priorities.max() if self.buffer else 1.0  # gives max priority if buffer is not empty else 1
 
-        self.buffer.insert(0, (state, action, reward, next_state, done))
-        self.priorities.insert(0, max_prio)
-
-    def sample(self, batch_size, c_k):
-        N = len(self.buffer)
-        if c_k > N:
-            c_k = N
-
-        if N == self.capacity:
-            prios = np.array(self.priorities)
+        if len(self.buffer) < self.capacity:
+            self.buffer.append((state, action, reward, next_state, done))
         else:
-            prios = np.array(list(self.priorities)[:c_k])
+            # puts the new data on the position of the oldes since it circles via pos variable
+            # since if len(buffer) == capacity -> pos == 0 -> oldest memory (at least for the first round?) 
+            self.buffer[self.pos] = (state, action, reward, next_state, done)
 
-        # (prios)
+        self.priorities[self.pos] = max_prio
+        self.pos = (
+                               self.pos + 1) % self.capacity  # lets the pos circle in the ranges of capacity if pos+1 > cap --> new posi = 0
+
+    def sample(self, batch_size):
+        N = len(self.buffer)
+        if N == self.capacity:
+            prios = self.priorities
+        else:
+            prios = self.priorities[:self.pos]
+
         # calc P = p^a/sum(p^a)
         probs = prios ** self.alpha
         P = probs / probs.sum()
 
-        # gets the indices depending on the probability p and the c_k range of the buffer
-        indices = np.random.choice(c_k, batch_size, p=P)
+        # gets the indices depending on the probability p
+        indices = np.random.choice(N, batch_size, p=P)
         samples = [self.buffer[idx] for idx in indices]
 
         beta = self.beta_by_frame(self.frame)
         self.frame += 1
 
         # Compute importance-sampling weight
-        weights = (c_k * P[indices]) ** (-beta)
+        weights = (N * P[indices]) ** (-beta)
         # normalize weights
         weights /= weights.max()
         weights = np.array(weights, dtype=np.float32)
@@ -355,53 +355,43 @@ class PrioritizedReplay(object):
         return len(self.buffer)
 
 
-def SAC(n_interactions, print_every=10):
+def SAC(n_episodes=200, max_t=1000, print_every=10):
     scores_deque = deque(maxlen=args.print_every)
-
-    eta_0 = 0.996
-    eta_T = 1.0
-    episodes = 0
-    max_ep_len = 10000  # original = 1000
-    c_k_min = 5000  # original = 5000
     t = 0
-    # for t in range(1, int(n_interactions)+1):
-    while t < n_interactions:
+    for i_episode in range(1, n_episodes + 1):
+
         state, info = env.reset()
-        episode_K = 0
         score = 0
-        for i in range(max_ep_len):
+        while True:
             t += 1
             action = agent.act(state)
             action_v = action[0].numpy()
             action_v = np.clip(action_v * action_high, action_low, action_high)
             next_state, reward, done, _, info = env.step(action_v)
-            agent.add_sample(state, action, reward, next_state, done)
-            eta_t = eta_0 + (eta_T - eta_0) * (t / n_interactions)
+            agent.step(state, action, reward, next_state, done, t)
             state = next_state
             score += reward
-            episode_K += 1
-            if done or i == max_ep_len:
-                episodes += 1
-                for k in range(1, episode_K):
-                    c_k = max(int(agent.memory.__len__() * eta_t ** (k * (max_ep_len / episode_K))), c_k_min)
-                    agent.step(c_k)
 
-                scores_deque.append(score)
-                writer.add_scalar("Reward", score, episodes)
-                writer.add_scalar("average_X", np.mean(scores_deque), episodes)
-                print('\rEpisode {} Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
-                                                                                     np.mean(scores_deque)), end="")
-                if episodes % print_every == 0:
-                    print('\rEpisode {}  Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
-                                                                                          np.mean(scores_deque)))
+            if done:
                 break
 
-    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/"+ args.env + "/" + args.info + ".pt")
+        scores_deque.append(score)
+        writer.add_scalar("Reward", score, i_episode)
+        writer.add_scalar("average_X", np.mean(scores_deque), i_episode)
+
+        print('\rEpisode {} Reward: {:.2f}  Average100 Score: {:.2f}'.format(i_episode, score, np.mean(scores_deque)),
+              end="")
+        if i_episode % print_every == 0:
+            print('\rEpisode {}  Reward: {:.2f}  Average100 Score: {:.2f}'.format(i_episode, score,
+                                                                                  np.mean(scores_deque)))
+
+    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_PER/"+ args.env + "/" + args.info + ".pt")
 
 
 def play():
     agent.actor_local.eval()
     for i_episode in range(1):
+
         state, info = env.reset()
 
         while True:
@@ -418,19 +408,19 @@ def play():
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-env", type=str, default="Pendulum-v1", help="Name of the Environment")
-parser.add_argument("-frames", type=int, default=20000, help="Number of frames to train, default = 20000")
+parser.add_argument("-ep", type=int, default=100, help="Number of Episodes to train, default = 100")
 parser.add_argument("-bs", "--buffer_size", type=int, default=int(1e6), help="Size of the Replay buffer, default= 1e6")
 parser.add_argument("-bsize", "--batch_size", type=int, default=256,
                     help="Batch size for the optimization process, default = 256")
 parser.add_argument("-seed", type=int, default=0, help="Seed for the env and torch network weights, default is 0")
-parser.add_argument("-lr", type=float, default=5e-4, help="Learning Rate, default 5e-4")
+parser.add_argument("-lr", type=float, default=5e-4, help="Learning Rate, default = 5e-4")
 parser.add_argument("-g", type=float, default=0.99, help="discount factor gamma, default = 0.99")
 parser.add_argument("-wd", type=float, default=0, help="Weight decay, default = 0")
 parser.add_argument("-ls", "--layer_size", type=int, default=256,
                     help="Number of nodes per neural network layer, default = 256")
 parser.add_argument("--print_every", type=int, default=100,
                     help="Prints every x episodes the average reward over x episodes")
-parser.add_argument("-info", type=str, default='sac_ere_per', help="tensorboard test run information")
+parser.add_argument("-info", type=str, default='sac_per', help="tensorboard test run information")
 parser.add_argument("-device", type=str, default="cuda:0", help="Change to CPU computing or GPU, default=cuda:0")
 parser.add_argument("--saved_model", type=str, default=None, help="Load a saved model to perform a test run!")
 parser.add_argument("-t", "--tau", type=float, default=1e-2, help="Softupdate factor tau, default is 1e-2")
@@ -438,11 +428,9 @@ parser.add_argument("-t", "--tau", type=float, default=1e-2, help="Softupdate fa
 args = parser.parse_args()
 
 if __name__ == "__main__":
-
     seed = args.seed
     BUFFER_SIZE = args.buffer_size
     BATCH_SIZE = args.batch_size  # minibatch size
-    n_interactions = args.frames
     GAMMA = args.g  # discount factor
     TAU = args.tau  # for soft update of target parameters
     LR_ACTOR = args.lr  # learning rate of the actor
@@ -459,17 +447,16 @@ if __name__ == "__main__":
     action_size = env.action_space.shape[0]
     action_high = env.action_space.high[0]
     action_low = env.action_space.low[0]
-    writer = SummaryWriter("./save_model/SAC_ERE_PER/"+args.env)
+
+    writer = SummaryWriter("./save_model/SAC_PER/" + args.env)
     agent = Agent(state_size=state_size, action_size=action_size, random_seed=seed, action_prior="uniform")  # "normal"
 
     start_time = time.time()
-
     if saved_model != None:
         agent.actor_local.load_state_dict(torch.load(saved_model))
         play()
     else:
-        SAC(n_interactions=args.frames, print_every=args.print_every)
-
+        SAC(n_episodes=args.ep, max_t=500, print_every=args.print_every)
     end_time = time.time()
     env.close()
     print("Training took: {} min".format((end_time - start_time) / 60))
