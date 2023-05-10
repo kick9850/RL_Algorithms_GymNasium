@@ -357,18 +357,18 @@ class PrioritizedReplay(object):
 
 def SAC(n_interactions, print_every=10):
     scores_deque = deque(maxlen=args.print_every)
-
+    state, info = env.reset()
+    episode_K = 0
+    score = 0
     eta_0 = 0.996
     eta_T = 1.0
     episodes = 0
     max_ep_len = 1000  # original = 1000
     c_k_min = 5000  # original = 5000
     t = 0
+
     for t in range(1, int(n_interactions)+1):
     #while t < n_interactions:
-        state, info = env.reset()
-        episode_K = 0
-        score = 0
         for i in range(max_ep_len):
             t += 1
             action = agent.act(state)
@@ -380,21 +380,25 @@ def SAC(n_interactions, print_every=10):
             state = next_state
             score += reward
             episode_K += 1
-            if done or i == max_ep_len:
+
+            if done or i == max_ep_len-1:
                 episodes += 1
                 for k in range(1, episode_K):
                     c_k = max(int(agent.memory.__len__() * eta_t ** (k * (max_ep_len / episode_K))), c_k_min)
                     agent.step(c_k)
 
-        scores_deque.append(score)
-        writer.add_scalar("Reward", score, episodes)
-        writer.add_scalar("average_X", np.mean(scores_deque), episodes)
-        print('\rEpisode {} Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
-                                                                             np.mean(scores_deque)), end="")
-        if episodes % print_every == 0:
-            print('\rEpisode {}  Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
-                                                                                  np.mean(scores_deque)))
-        break
+                scores_deque.append(score)
+                writer.add_scalar("Reward", score, episodes)
+                writer.add_scalar("average_X", np.mean(scores_deque), episodes)
+                print('\rEpisode {} Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
+                                                                                     np.mean(scores_deque)), end="")
+                if episodes % print_every == 0:
+                    print('\rEpisode {}  Reward: {:.2f}  Average100 Score: {:.2f}'.format(episodes, score,
+                                                                                          np.mean(scores_deque)))
+                state, info = env.reset()
+                episode_K = 0
+                score = 0
+                break
 
     torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/" + args.env + "/" + args.info + ".pt")
 
