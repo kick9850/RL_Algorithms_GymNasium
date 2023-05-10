@@ -363,7 +363,7 @@ def SAC(n_episodes=200, max_t=500, print_every=10):
             print('\rEpisode {}  Reward: {:.2f}  Average100 Score: {:.2f}'.format(i_episode, score,
                                                                                   np.mean(scores_deque)))
 
-    torch.save(agent.actor_local.state_dict(), args.info + ".pt")
+    torch.save(agent.actor_local.state_dict(), "./save_model/SAC/" + args.env + "/" + args.info + ".pt")
 
 
 def play():

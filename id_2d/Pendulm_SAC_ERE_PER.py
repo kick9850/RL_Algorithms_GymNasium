@@ -398,7 +398,7 @@ def SAC(n_interactions, print_every=10):
                 score = 0
                 break
 
-    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/"+ args.env + args.info + ".pt")
+    torch.save(agent.actor_local.state_dict(), "./save_model/SAC_ERE_PER/"+ args.env + "/" + args.info + ".pt")
 
 
 def play():
