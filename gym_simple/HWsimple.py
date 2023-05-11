@@ -8,7 +8,7 @@ def main():
     num_episodes = 1000000
 
     for episode in range(num_episodes):
-        state = env.reset()
+        state, info = env.reset()
         done = False
         total_reward = 0
         timesteps = 0

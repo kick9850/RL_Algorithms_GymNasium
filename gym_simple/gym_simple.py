@@ -7,7 +7,7 @@ def main():
 
     for episode in range(num_episodes):
         # 환경 초기화
-        observation = env.reset()
+        observation, info = env.reset()
         done = False
         total_reward = 0
         timesteps = 0
