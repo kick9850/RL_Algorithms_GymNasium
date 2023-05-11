@@ -10,7 +10,7 @@ import torch
 import torch.nn as nn
 from torch.distributions.normal import Normal
 
-import gym
+import gymnasium as gym
 
 device = torch.device("cuda")
 

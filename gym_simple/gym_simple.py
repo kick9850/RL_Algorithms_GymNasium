@@ -1,4 +1,4 @@
-import gym
+import gymnasium as gym
 
 def main():
     # 환경 생성
