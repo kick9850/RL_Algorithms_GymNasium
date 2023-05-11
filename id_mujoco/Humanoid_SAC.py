@@ -16,7 +16,6 @@ import numpy as np
 import argparse
 
 
-
 def main():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-env", type=str, default="Humanoid-v4", help="Environment name")
