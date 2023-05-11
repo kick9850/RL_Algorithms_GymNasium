@@ -24,3 +24,4 @@ https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26
 <br/> https://pytorch.org/tutorials/intermediate/reinforcement_ppo.html
 <br/> https://github.com/sweetice/Deep-reinforcement-learning-with-pytorch
 <br/> https://github.com/BY571/Soft-Actor-Critic-and-Extensions
+<br/> https://github.com/rlcode/per
