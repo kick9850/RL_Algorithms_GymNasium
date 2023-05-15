@@ -370,16 +370,7 @@ def main():
     args = parser.parse_args()
 
     env_name = args.env
-    seed = args.seed
     n_episodes = args.ep
-    GAMMA = args.gamma
-    TAU = args.tau
-    HIDDEN_SIZE = args.layer_size
-    BUFFER_SIZE = int(args.replay_memory)
-    BATCH_SIZE = args.batch_size  # minibatch size
-    LR_ACTOR = args.lr  # learning rate of the actor
-    LR_CRITIC = args.lr  # learning rate of the critic
-    FIXED_ALPHA = args.alpha
     saved_model = args.saved_model
 
     t0 = time.time()
@@ -392,16 +383,16 @@ def main():
     action_size = env.action_space.shape[0]
     agent = Agent(state_size=state_size,
                   action_size=action_size,
-                  random_seed=seed,
-                  hidden_size=HIDDEN_SIZE,
+                  random_seed=args.seed,
+                  hidden_size=args.layer_size,
                   action_prior="uniform", # "normal"
-                  gamma=GAMMA,
-                  lr_actor=LR_ACTOR,
-                  lr_critic=LR_CRITIC,
-                  buffer_size=BUFFER_SIZE,
-                  batch_size=BATCH_SIZE,
-                  alpha=FIXED_ALPHA,
-                  tau=TAU)
+                  gamma=args.gamma,
+                  lr_actor=args.lr,
+                  lr_critic=args.lr,
+                  buffer_size=int(args.replay_memory),
+                  batch_size=args.batch_size,
+                  alpha=args.alpha,
+                  tau=args.tau)
 
     if saved_model != None:
         agent.actor_local.load_state_dict(torch.load(saved_model))
