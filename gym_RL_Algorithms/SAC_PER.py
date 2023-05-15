@@ -338,8 +338,7 @@ class PrioritizedReplay(object):
             self.buffer[self.pos] = (state, action, reward, next_state, done)
 
         self.priorities[self.pos] = max_prio
-        self.pos = (
-                               self.pos + 1) % self.capacity  # lets the pos circle in the ranges of capacity if pos+1 > cap --> new posi = 0
+        self.pos = (self.pos + 1) % self.capacity  # lets the pos circle in the ranges of capacity if pos+1 > cap --> new posi = 0
 
     def sample(self, batch_size):
         N = len(self.buffer)
