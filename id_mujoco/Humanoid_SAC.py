@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-env", type=str, default="Humanoid-v4", help="Environment name")
     parser.add_argument("-info", type=str, default='sac', help="Information or name of the run")
-    parser.add_argument("-ep", type=int, default=10, help="The amount of training episodes, default is 100")
+    parser.add_argument("-ep", type=int, default=10000, help="The amount of training episodes, default is 100")
     parser.add_argument("-seed", type=int, default=0, help="Seed for the env and torch network weights, default is 0")
     parser.add_argument("-lr", type=float, default=5e-4,
                         help="Learning rate of adapting the network weights, default is 5e-4")
@@ -53,7 +53,7 @@ def main():
 
     t0 = time.time()
     writer = SummaryWriter("./save_model/"+args.env+"/SAC")
-    env = gym.make(env_name)
+    env = gym.make(env_name, render_mode='human')
     action_high = env.action_space.high[0]
     action_low = env.action_space.low[0]
 
@@ -76,11 +76,11 @@ def main():
         agent.actor_local.load_state_dict(torch.load(saved_model))
         agent.actor_local.eval()
         for i_episode in range(1):
-
             state, info = env.reset()
             state = state.reshape((1, state_size))
 
             while True:
+                env.render()
                 action = agent.act(state)
                 action_v = action[0].numpy()
                 action_v = np.clip(action_v * action_high, action_low, action_high)
