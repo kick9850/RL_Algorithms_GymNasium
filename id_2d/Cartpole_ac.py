@@ -5,7 +5,7 @@ from gym_RL_Algorithms.AC import Agent
 
 def main():
     # Parameters
-    env = gym.make('CartPole-v1', render_mode='human')
+    env = gym.make('CartPole-v1')
     env = env.unwrapped
 
     torch.manual_seed(1)
@@ -15,8 +15,8 @@ def main():
     # Hyperparameters
     learning_rate = 0.01
     gamma = 0.99
-    episodes = 20000
-    render = True
+    episodes = 2000
+    render = False
 
     agent = Agent(state_space=state_space,
                   action_space=action_space,
@@ -32,7 +32,8 @@ def main():
         for t in count():
             action = agent.select_action(state)
             state, reward, done, _, info = env.step(action)
-            if render: env.render()
+            if render:
+                env.render()
             agent.model.rewards.append(reward)
 
             if done or t >= 1000:
