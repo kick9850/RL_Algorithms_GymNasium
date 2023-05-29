@@ -18,7 +18,8 @@ mujoco  2.3.3
 pygame  2.3.0
 ```
 # Watching Original Git Code
-https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26/
+RL_Algorithms
+<br/> https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26/
 <br/> https://gymnasium.farama.org/tutorials/training_agents/blackjack_tutorial/
 <br/> https://gymnasium.farama.org/tutorials/training_agents/FrozenLake_tuto/
 <br/> https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
@@ -26,3 +27,5 @@ https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26
 <br/> https://github.com/sweetice/Deep-reinforcement-learning-with-pytorch
 <br/> https://github.com/BY571/Soft-Actor-Critic-and-Extensions
 <br/> https://github.com/rlcode/per
+<br/> Multi-Agent-env
+<br/> https://github.com/schroederdewitt/multiagent_mujoco
