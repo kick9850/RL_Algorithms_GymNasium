@@ -11,10 +11,11 @@ OpenAi github         : https://github.com/Farama-Foundation/Gymnasium
 
 # Using Python library list
 ```
-Python 3.8
-Pytorch 1.13.1
-mujoco 2.3.3
-pygame 2.3.0
+Python  3.8
+Pytorch 2.0
+cuda    11.8
+mujoco  2.3.3
+pygame  2.3.0
 ```
 # Watching Original Git Code
 https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26/
