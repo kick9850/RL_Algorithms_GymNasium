@@ -28,4 +28,4 @@ RL_Algorithms
 <br/> https://github.com/BY571/Soft-Actor-Critic-and-Extensions
 <br/> https://github.com/rlcode/per
 <br/> Multi-Agent-env
-<br/> https://github.com/schroederdewitt/multiagent_mujoco
+<br/> https://github.com/Farama-Foundation/Gymnasium-Robotics/tree/main/gymnasium_robotics/envs/multiagent_mujoco
