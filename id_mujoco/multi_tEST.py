@@ -1,6 +1,6 @@
 import gymnasium as gym
 
-env = gym.make("FetchReach-v2")
+env = gym.make("FetchReach-v2", render_mode='human')
 env.reset()
 obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
 
