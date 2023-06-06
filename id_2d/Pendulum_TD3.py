@@ -86,7 +86,6 @@ def main():
                     break
                 state = next_state
 
-
     elif args.mode == 'train':
         print("====================================")
         print("Collection Experience...")
