@@ -92,7 +92,6 @@ class TD3():
                  gamma,
                  tau
                  ):
-
         self.capacity = capacity
         self.directory = directory
         self.policy_delay = policy_delay
