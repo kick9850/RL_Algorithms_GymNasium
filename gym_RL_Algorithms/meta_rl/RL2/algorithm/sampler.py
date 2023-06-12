@@ -52,7 +52,7 @@ class Sampler:
         log_probs = []
 
         cur_step = 0
-        obs = self.env.reset()
+        obs, _ = self.env.reset()
         action = np.zeros(self.action_dim)
         reward = np.zeros(1)
         done = np.zeros(1)
@@ -83,12 +83,12 @@ class Sampler:
             self.cur_samples += 1
         return dict(
             trans=np.array(trans),
-            pi_hiddens=np.array(pi_hiddens),
-            v_hiddens=np.array(v_hiddens),
-            actions=np.array(actions),
-            rewards=np.array(rewards),
-            dones=np.array(dones),
-            infos=np.array(infos),
-            values=np.array(values),
-            log_probs=np.array(log_probs),
+            pi_hiddens=np.array(pi_hiddens, dtype=np.float64),
+            v_hiddens=np.array(v_hiddens, dtype=np.float64),
+            actions=np.array(actions, dtype=np.float64),
+            rewards=np.array(rewards, dtype=np.float64),
+            dones=np.array(dones, dtype=np.bool),
+            infos=np.array(infos, dtype=np.float64),
+            values=np.array(values, dtype=np.float64),
+            log_probs=np.array(log_probs, dtype=np.float64),
         )

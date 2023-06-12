@@ -1,12 +1,14 @@
 import numpy as np
+import gymnasium
 from gymnasium import utils
-from gymnasium.envs.mujoco import HalfCheetahEnv as HalfCheetahEnv_
+from gymnasium.envs.mujoco.half_cheetah_v4 import HalfCheetahEnv as HalfCheetahEnv_
 from gymnasium.envs.mujoco import mujoco_env
 
 
-class HalfCheetahEnv(HalfCheetahEnv_):
+class HalfCheetahEnv(HalfCheetahEnv_, mujoco_env.MujocoEnv):
     def __init__(self):
-        mujoco_env.MujocoEnv.__init__(self, "half_cheetah.xml", 5)
+        observation_space = gymnasium.spaces.Box(-np.inf, np.inf, (18,), np.float64)
+        mujoco_env.MujocoEnv.__init__(self, "half_cheetah.xml", 5, observation_space)
         utils.EzPickle.__init__(self)
 
     def _get_obs(self) -> np.ndarray:

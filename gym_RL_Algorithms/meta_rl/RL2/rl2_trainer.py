@@ -36,7 +36,7 @@ if __name__ == "__main__":
 
     observ_dim: int = env.observation_space.shape[0]
     action_dim: int = env.action_space.shape[0]
-    trans_dim: int = observ_dim + action_dim + 2
+    trans_dim: int = observ_dim + action_dim + 4
     hidden_dim: int = env_target_config["hidden_dim"]
 
     device: torch.device = (

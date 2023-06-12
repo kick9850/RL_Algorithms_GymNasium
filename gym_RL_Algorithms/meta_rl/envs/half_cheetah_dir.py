@@ -14,6 +14,8 @@ class HalfCheetahDirEnv(HalfCheetahEnv):
         assert num_tasks == len(self.tasks)
         self._task = self.tasks[0]
         self._goal_dir = self._task["direction"]
+        self._reset_noise_scale = 0.1
+
         super().__init__()
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, np.float64, bool, Dict[str, Any]]:
