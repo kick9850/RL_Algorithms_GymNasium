@@ -7,8 +7,8 @@ import yaml
 from gymnasium.envs.mujoco.half_cheetah import HalfCheetahEnv
 
 from gym_RL_Algorithms.meta_rl.envs import ENVS
-from gym_RL_Algorithms.meta_rl.RL2.algoritms.meta_learner import MetaLearner
-from gym_RL_Algorithms.meta_rl.RL2.algoritms.ppo import PPO
+from gym_RL_Algorithms.meta_rl.RL2.algorithm.meta_learner import MetaLearner
+from gym_RL_Algorithms.meta_rl.RL2.algorithm.ppo import PPO
 
 if __name__ == "__main__":
     # 실험 환경 설정에 대한 하이퍼파라미터들 불러오기
