@@ -35,7 +35,6 @@ class Sampler:
             traj = self.rollout(accum_context=accum_context)
             trajs.append(traj)
             cur_samples += len(traj["cur_obs"])
-            print(cur_samples)
             self.agent.encoder.sample_z()
 
             if update_posterior:
