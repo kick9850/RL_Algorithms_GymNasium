@@ -91,10 +91,8 @@ class SAC:
     def get_action(self, obs: np.ndarray) -> np.ndarray:
         # 주어진 관측 상태에 따른 현재 정책의 행동 얻기
         task_z = self.encoder.task_z
-        # print(task_z.size())
         obs = torch.Tensor(obs).view(1, -1).to(self.device)
         inputs = torch.cat([obs, task_z], dim=-1).to(self.device)
-        # print(inputs.size())
         action, _ = self.policy(inputs)
         return action.view(-1).detach().cpu().numpy()
 

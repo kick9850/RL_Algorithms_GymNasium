@@ -1,7 +1,7 @@
 # PEARL 실험 환경 설정
 
 # "dir" 또는 "vel" 중에 하나 선택 (str)
-env_name: "vel"
+env_name: "dir"
 
 # 저장할 실험 이름 (str)
 save_exp_name: "exp_1"
