@@ -60,6 +60,7 @@ if __name__ == "__main__":
         trans_dim=trans_dim,
         action_dim=action_dim,
         hidden_dim=hidden_dim,
+
         train_tasks=list(tasks[: env_target_config["train_tasks"]]),
         test_tasks=list(tasks[-env_target_config["test_tasks"] :]),
         save_exp_name=experiment_config["save_exp_name"],

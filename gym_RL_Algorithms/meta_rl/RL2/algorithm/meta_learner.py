@@ -66,7 +66,7 @@ class MetaLearner:
         )
 
         if not save_file_name:
-            save_file_name = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+            save_file_name = datetime.datetime.now().strftime("%Y-%m-%d")
         self.result_path = os.path.join("results", save_exp_name, save_file_name)
         self.writer = SummaryWriter(log_dir=self.result_path)
 
