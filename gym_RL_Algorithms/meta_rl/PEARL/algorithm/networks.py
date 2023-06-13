@@ -32,7 +32,7 @@ class MLP(nn.Module):
             in_layer = hidden_layer
             self.__setattr__("fc_layer{}".format(i), fc_layer)
             self.fc_layers.append(fc_layer)
-            print(self.fc_layers)
+            #print(self.fc_layers)
 
         # 출력 레이어 생성
         self.last_fc_layer = nn.Linear(hidden_dim, output_dim)
@@ -76,6 +76,7 @@ class MLPEncoder(FlattenMLP):
 
     def clear_z(self, num_tasks: int = 1) -> None:
         # q(z|c)를 prior r(z)로 초기화
+
         self.z_mean = torch.zeros(num_tasks, self.latent_dim).to(self.device)
         self.z_var = torch.ones(num_tasks, self.latent_dim).to(self.device)
 
@@ -87,13 +88,16 @@ class MLPEncoder(FlattenMLP):
 
     def sample_z(self) -> None:
         # z ~ r(z) 또는 z ~ q(z|c) 생성
+
+        z = self.z_var
         dists = []
         for mean, var in zip(torch.unbind(self.z_mean), torch.unbind(self.z_var)):
             dist = torch.distributions.Normal(mean, torch.sqrt(var))
             dists.append(dist)
         sampled_z = [dist.rsample() for dist in dists]
+        #print(sampled_z)
         self.task_z = torch.stack(sampled_z).to(self.device)
-
+        #print(self.task_z.size())
     @classmethod
     def product_of_gaussians(
         cls,
@@ -162,8 +166,10 @@ class TanhGaussianPolicy(MLP):
         self.last_fc_log_std.bias.data.uniform_(-init_w, init_w)
 
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        # print(x.size())
         for fc_layer in self.fc_layers:
             #print(fc_layer)
+
             x = self.hidden_activation(fc_layer(x))
 
         mean = self.last_fc_layer(x)

@@ -35,6 +35,7 @@ class Sampler:
             traj = self.rollout(accum_context=accum_context)
             trajs.append(traj)
             cur_samples += len(traj["cur_obs"])
+            print(cur_samples)
             self.agent.encoder.sample_z()
 
             if update_posterior:
@@ -55,6 +56,7 @@ class Sampler:
         cur_step = 0
 
         while not (done or cur_step == self.max_step):
+            #print(len(obs))
             action = self.agent.get_action(obs)
             next_obs, reward, done, info = self.env.step(action)
 

@@ -13,6 +13,7 @@ class HalfCheetahVelEnv(HalfCheetahEnv):
         self._task = self.tasks[0]
         self._goal_vel = self._task["velocity"]
         super().__init__()
+        self._reset_noise_scale = 0.1
 
     def step(self, action: np.ndarray) -> Tuple[np.ndarray, np.float64, bool, Dict[str, Any]]:
         xposbefore = self.data.qpos[0]
@@ -43,3 +44,20 @@ class HalfCheetahVelEnv(HalfCheetahEnv):
         self._task = self.tasks[idx]
         self._goal_vel = self._task["velocity"]
         self.reset()
+
+    def reset_model(self):
+        noise_low = -self._reset_noise_scale
+        noise_high = self._reset_noise_scale
+
+        qpos = self.init_qpos + self.np_random.uniform(
+            low=noise_low, high=noise_high, size=self.model.nq
+        )
+        qvel = (
+                self.init_qvel
+                + self._reset_noise_scale * self.np_random.standard_normal(self.model.nv)
+        )
+
+        self.set_state(qpos, qvel)
+
+        observation = self._get_obs()
+        return observation

@@ -1,6 +1,6 @@
 # 실험 환경 설정
 
-env_name : "dir"
+env_name : "vel"
 
 save_exp_name : "exp_1"
 
