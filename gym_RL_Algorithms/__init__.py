@@ -1,3 +1,3 @@
 import gymnasium
-import Basic
-import meta_rl
+from gym_RL_Algorithms import meta_rl
+from gym_RL_Algorithms import Basic
