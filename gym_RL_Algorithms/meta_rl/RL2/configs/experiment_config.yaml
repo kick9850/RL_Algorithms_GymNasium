@@ -6,7 +6,7 @@ save_exp_name : "exp_1"
 
 save_file_name : null
 
-load_exp_name : null
+load_exp_name : "exp_1"
 
 load_file_name : null
 
