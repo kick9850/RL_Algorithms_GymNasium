@@ -1,7 +1,7 @@
 import gymnasium as gym
 from itertools import count
 import torch
-from gym_RL_Algorithms.AC import Agent
+from gym_RL_Algorithms.Basic.AC import Agent
 
 def main():
     # Parameters

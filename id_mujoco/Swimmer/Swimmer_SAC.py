@@ -6,7 +6,7 @@ Created on Wed Nov  6 12:24:34 2019
 """
 
 import gymnasium as gym
-from gym_RL_Algorithms.SAC import Agent
+from gym_RL_Algorithms.Basic.SAC import Agent
 import time
 
 import torch

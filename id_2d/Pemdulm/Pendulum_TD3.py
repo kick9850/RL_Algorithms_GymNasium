@@ -4,7 +4,7 @@ import os, sys, random
 import numpy as np
 import gymnasium as gym
 import torch
-from gym_RL_Algorithms.TD3 import TD3
+from gym_RL_Algorithms.Basic.TD3 import TD3
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--mode', default='train', type=str) # mode = 'train' or 'test'
