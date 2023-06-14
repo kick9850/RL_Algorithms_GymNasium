@@ -27,7 +27,7 @@ RL_Algorithms
 <br/> https://gymnasium.farama.org/tutorials/training_agents/blackjack_tutorial/
 <br/> https://gymnasium.farama.org/tutorials/training_agents/FrozenLake_tuto/
 <br/> https://pytorch.org/tutorials/intermediate/reinforcement_q_learning.html
-<br/> DQN / SAC / TD3
+<br/> DQN / SAC / TD3 / ...
 <br/> https://github.com/sweetice/Deep-reinforcement-learning-with-pytorch
 <br/> https://github.com/BY571/Soft-Actor-Critic-and-Extensions
 <br/> PER(Prioritized Experience Replay)
