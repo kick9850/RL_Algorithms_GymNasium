@@ -32,5 +32,7 @@ RL_Algorithms
 <br/> https://github.com/BY571/Soft-Actor-Critic-and-Extensions
 <br/> PER(Prioritized Experience Replay)
 <br/> https://github.com/rlcode/per
+<br/> Meta-RL
+<br/> https://github.com/dongminlee94/meta-learning-for-everyone
 <br/> Multi-Agent-env
 <br/> https://github.com/Farama-Foundation/Gymnasium-Robotics/tree/main/gymnasium_robotics/envs/multiagent_mujoco
