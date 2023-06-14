@@ -34,7 +34,7 @@ if __name__ == "__main__":
     np.random.seed(experiment_config["seed"])
     torch.manual_seed(experiment_config["seed"])
 
-    observ_dim: int = env.observation_space.shape[0]
+    observ_dim: int = env.observation_space.shape[0] + 2
     action_dim: int = env.action_space.shape[0]
     policy_hidden_dim: int = env_target_config["policy_hidden_dim"]
     vf_hidden_dim: int = env_target_config["value_function_hidden_dim"]

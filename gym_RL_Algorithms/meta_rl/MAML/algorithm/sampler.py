@@ -45,7 +45,7 @@ class Sampler:
         _infos = []
 
         cur_step = 0
-        obs = self.env.reset()
+        obs,_ = self.env.reset()
         done = np.zeros(1)
 
         while not (done or cur_step == self.max_step):
