@@ -14,6 +14,7 @@ OpenAi github         : https://github.com/Farama-Foundation/Gymnasium
 Python  3.8
 Pytorch 2.0
 cuda    11.8
+gymnasium 0.28.1
 mujoco  2.3.3
 pygame  2.3.0
 ```
