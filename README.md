@@ -17,6 +17,7 @@ cuda    11.8
 mujoco  2.3.3
 pygame  2.3.0
 ```
+
 # Watching Original Git Code
 RL_Algorithms
 <br/> https://gymnasium.farama.org/tutorials/training_agents/reinforce_invpend_gym_v26/
