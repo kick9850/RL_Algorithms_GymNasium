@@ -169,8 +169,7 @@ class Agent():
     def step(self, c_k):
         # Learn, if enough samples are available in memory
         experiences = self.memory.sample(BATCH_SIZE, c_k)
-        if experiences:
-            self.learn(experiences, GAMMA)
+        self.learn(experiences, GAMMA)
 
     def act(self, state, add_noise=True):
         """Returns actions for given state as per current policy."""
@@ -289,9 +288,9 @@ class PrioritizedReplay(object):
         self.beta_frames = beta_frames
         self.frame = 1  # for beta calculation
         self.capacity = capacity
-        self.buffer = []
+        self.buffer = deque(maxlen=capacity)
         self.pos = 0
-        self.priorities = np.zeros((capacity,), dtype=np.float32)
+        self.priorities = deque(maxlen=capacity)
 
     def beta_by_frame(self, frame_idx):
         """
@@ -341,7 +340,7 @@ class PrioritizedReplay(object):
         P = probs / probs.sum()
 
         # gets the indices depending on the probability p and the c_k range of the buffer
-        indices = np.random.choice(c_k, batch_size, p=P)
+        indices = np.random.choice(c_k, size=batch_size, replace=False, p=P)
         samples = [self.buffer[idx] for idx in indices]
 
         beta = self.beta_by_frame(self.frame)
