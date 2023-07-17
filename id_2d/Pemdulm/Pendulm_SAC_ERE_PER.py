@@ -37,6 +37,7 @@ class Actor(nn.Module):
         self.seed = torch.manual_seed(seed)
         self.log_std_min = log_std_min
         self.log_std_max = log_std_max
+
         self.init_w = init_w
         self.fc1 = nn.Linear(state_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
@@ -282,16 +283,15 @@ class PrioritizedReplay(object):
     """
     Proportional Prioritization
     """
-
-    def __init__(self, capacity, alpha=0.6, beta_start=0.4, beta_frames=int(1e5)):
+    def __init__(self, capacity, alpha=0.6, beta_start = 0.4, beta_frames=int(1e5)):
         self.alpha = alpha
         self.beta_start = beta_start
         self.beta_frames = beta_frames
-        self.frame = 1  # for beta calculation
-        self.capacity = capacity
-        self.buffer = []
-        self.pos = 0
-        self.priorities = np.zeros((capacity,), dtype=np.float32)
+        self.frame = 1 #for beta calculation
+        self.capacity   = capacity
+        self.buffer     = deque(maxlen=capacity)
+        self.pos        = 0
+        self.priorities = deque(maxlen=capacity)
 
     def beta_by_frame(self, frame_idx):
         """
@@ -312,18 +312,10 @@ class PrioritizedReplay(object):
         state = np.expand_dims(state, 0)
         next_state = np.expand_dims(next_state, 0)
 
-        max_prio = self.priorities.max() if self.buffer else 1.0  # gives max priority if buffer is not empty else 1
+        max_prio = max(self.priorities) if self.buffer else 1.0  # gives max priority if buffer is not empty else 1
 
-        if len(self.buffer) < self.capacity:
-            self.buffer.append((state, action, reward, next_state, done))
-        else:
-            # puts the new data on the position of the oldes since it circles via pos variable
-            # since if len(buffer) == capacity -> pos == 0 -> oldest memory (at least for the first round?)
-            self.buffer[self.pos] = (state, action, reward, next_state, done)
-
-        self.priorities[self.pos] = max_prio
-        self.pos = (
-                               self.pos + 1) % self.capacity  # lets the pos circle in the ranges of capacity if pos+1 > cap --> new posi = 0
+        self.buffer.insert(0, (state, action, reward, next_state, done))
+        self.priorities.insert(0, max_prio)
 
     def sample(self, batch_size, c_k):
         N = len(self.buffer)
@@ -372,8 +364,8 @@ def SAC(n_interactions, print_every=10):
     eta_0 = 0.996
     eta_T = 1.0
     episodes = 0
-    max_ep_len = 1000  # original = 1000
-    c_k_min = 5000  # original = 5000
+    max_ep_len = 500  # original = 1000
+    c_k_min = 2500  # original = 5000
     t = 0
 
     for t in range(1, int(n_interactions)+1):
