@@ -12,7 +12,7 @@ import argparse
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-env", type=str, default="Pendulum-v1", help="Name of the Environment")
-    parser.add_argument("-ep", type=int, default=10000, help="Number of Episodes to train, default = 100")
+    parser.add_argument("-ep", type=int, default=20000, help="Number of Episodes to train, default = 100")
     parser.add_argument("-bs", "--buffer_size", type=int, default=int(1e6), help="Size of the Replay buffer, default= 1e6")
     parser.add_argument("-bsize", "--batch_size", type=int, default=256,
                         help="Batch size for the optimization process, default = 256")
@@ -75,7 +75,7 @@ def main():
                 if done:
                     break
     else:
-        n_episodes = 200
+        n_episodes = args.ep
         max_t = 1000
         scores_deque = deque(maxlen=args.print_every)
         t = 0

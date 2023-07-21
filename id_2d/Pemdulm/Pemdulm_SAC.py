@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument("-env", type=str, default="Pendulum-v1", help="Environment name")
     parser.add_argument("-info", type=str, default='sac', help="Information or name of the run")
-    parser.add_argument("-ep", type=int, default=1000, help="The amount of training episodes, default is 100")
+    parser.add_argument("-ep", type=int, default=20000, help="The amount of training episodes, default is 100")
     parser.add_argument("-seed", type=int, default=0, help="Seed for the env and torch network weights, default is 0")
     parser.add_argument("-lr", type=float, default=5e-4,
                         help="Learning rate of adapting the network weights, default is 5e-4")
@@ -91,7 +91,7 @@ def main():
                 if done:
                     break
     else:
-        max_t=500
+        max_t=1000
         print_every = args.print_every
 
         scores_deque = deque(maxlen=100)

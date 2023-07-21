@@ -15,8 +15,8 @@ parser.add_argument('--iteration', default=5, type=int)
 
 parser.add_argument('--learning_rate', default=3e-4, type=float)
 parser.add_argument('--gamma', default=0.99, type=int) # discounted factor
-parser.add_argument('--capacity', default=50000, type=int) # replay buffer size
-parser.add_argument('--num_iteration', default=100000, type=int) #  num of  games
+parser.add_argument('--capacity', default=5000, type=int) # replay buffer size
+parser.add_argument('--num_iteration', default=20000, type=int) #  num of  games
 parser.add_argument('--batch_size', default=100, type=int) # mini batch size
 parser.add_argument('--seed', default=1, type=int)
 

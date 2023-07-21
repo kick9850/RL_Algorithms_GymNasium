@@ -128,11 +128,6 @@ class TD3():
         return self.actor(state).cpu().data.numpy().flatten()
 
     def update(self, num_iteration):
-
-        if self.num_training % 500 == 0:
-            print("====================================")
-            print("model has been trained for {} times...".format(self.num_training))
-            print("====================================")
         for i in range(num_iteration):
             x, y, u, r, d = self.memory.sample(self.batch_size)
             state = torch.FloatTensor(x).to(device)

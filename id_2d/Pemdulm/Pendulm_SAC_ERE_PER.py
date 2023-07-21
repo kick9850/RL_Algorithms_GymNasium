@@ -424,7 +424,7 @@ def play():
 parser = argparse.ArgumentParser()
 parser.add_argument("-env", type=str, default="Pendulum-v1", help="Name of the Environment")
 parser.add_argument("-frames", type=int, default=20000, help="Number of frames to train, default = 20000")
-parser.add_argument("-bs", "--buffer_size", type=int, default=int(1e6), help="Size of the Replay buffer, default= 1e6")
+parser.add_argument("-bs", "--buffer_size", type=int, default=int(1e7), help="Size of the Replay buffer, default= 1e6")
 parser.add_argument("-bsize", "--batch_size", type=int, default=256,
                     help="Batch size for the optimization process, default = 256")
 parser.add_argument("-seed", type=int, default=0, help="Seed for the env and torch network weights, default is 0")
