@@ -20,9 +20,8 @@ class Qlearning():
         self.epsilon = epsilon
 
     def get_action(self, state):
-        state = np.array(state)
         state_indices = np.round(state).astype(int)
-        if np.random.rand() < self.epsilon:
+        if np.random.rand(0, 1) < self.epsilon:
             action = self.env.action_space.sample()
         else:
             action = np.argmax(self.Q_table[state_indices, :])
